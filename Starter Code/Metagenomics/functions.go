@@ -24,12 +24,5 @@ func SimpsonsMap(allMaps map[string](map[string]int)) map[string]float64 {
 /*
 func RichnessMap(allMaps map[string](map[string]int)) map[string]int {
 
-	richnessMap := make(map[string]int)
-
-	for sampleName, freqMap := range allMaps {
-		richnessMap[sampleName] = Richness(freqMap)
-	}
-
-	return richnessMap
 }
 */
