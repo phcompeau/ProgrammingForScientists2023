@@ -1,13 +1,18 @@
 package main
 
 import (
+	"fmt"
+	"gifhelper"
 	"math"
+	"os"
+	"strconv"
 )
 
 // G is the gravitational constant in the gravitational force equation.  It is declared as a "global" constant that can be accessed by all functions.
-const G = 6.67408e-11
+const G = 2 * 6.67408e-11
 
 func main() {
+	fmt.Println("Jupiter moons simulation!")
 	// declaring objects
 	var jupiter, io, europa, ganymede, callisto Body
 
@@ -54,11 +59,76 @@ func main() {
 
 	// now we need to implement the system
 
-	/*
-		numGens := blah
-		time := bleh
-		timePoints := SimulateGravity(jupiterSystem, numGens, time)
-	*/
+	//let's take command line arguments (CLAs) from the user
+	//CLAs get stored in an ARRAY of strings called os.Args
+	//this array has length equal to number of arguments given by the user + 1
 
-	//then we are going to visualize it and draw a GIF
+	//os.Args[0] is the name of the program (./jupiter)
+	fmt.Println(os.Args[0])
+
+	//let's take CLAs: numGens, time, output path?, width of canvas
+
+	numGens, err1 := strconv.Atoi(os.Args[1])
+	if err1 != nil {
+		//problem in converting this parameter
+		panic(err1)
+	}
+
+	if numGens < 0 {
+		panic("Error: negative number given as number of generations.")
+	}
+
+	time, err2 := strconv.ParseFloat(os.Args[2], 64)
+	if err2 != nil {
+		//problem in converting this parameter
+		panic(err2)
+	}
+
+	//third parameter is width (and height) of canvas in pixels
+	canvasWidth, err3 := strconv.Atoi(os.Args[3])
+	if err3 != nil {
+		//problem in converting this parameter
+		panic(err3)
+	}
+
+	if canvasWidth <= 0 {
+		panic("Error: nonpositive number given as canvas width.")
+	}
+
+	//we don't want to visualize every time unit, but we do want to use a small time unit so that the simulation is accurate
+	//solution: only draw every n-th universe to an image
+	drawingFrequency, err4 := strconv.Atoi(os.Args[4])
+	if err4 != nil {
+		//problem in converting this parameter
+		panic(err4)
+	}
+
+	if drawingFrequency <= 0 {
+		panic("Error: nonpositive number given as drawing frequency.")
+	}
+
+	outputFile := os.Args[5]
+
+	fmt.Println("CLAs read!")
+
+	fmt.Println("Now, simulating gravity.")
+
+	timePoints := SimulateGravity(jupiterSystem, numGens, time)
+
+	fmt.Println("Simulation complete!")
+
+	fmt.Println("Drawing universes.")
+
+	images := AnimateSystem(timePoints, canvasWidth, drawingFrequency)
+
+	fmt.Println("Images drawn!")
+
+	fmt.Println("Generating an animated GIF.")
+
+	gifhelper.ImagesToGIF(images, "output/"+outputFile)
+
+	fmt.Println("GIF drawn!")
+
+	fmt.Println("Simulation complete!")
+
 }

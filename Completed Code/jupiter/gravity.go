@@ -106,9 +106,40 @@ func UpdateAcceleration(currentUniverse Universe, b Body) OrderedPair {
 // ComputeNetForce takes as input a Universe object and a Body b.
 // It returns the net force (due to gravity) acting on b by all other objects in the given Universe.
 func ComputeNetForce(currentUniverse Universe, b Body) OrderedPair {
+	var netForce OrderedPair //vector
+
+	//range over all the bodies other than b, and pass computing the force of gravity to a subroutine, then add in components to net force vector
+	for i := range currentUniverse.bodies {
+		//only compute force if current body is not b
+		if currentUniverse.bodies[i] != b { // this is OK :)
+			force := ComputeForce(b, currentUniverse.bodies[i])
+			//add components of force to netForce
+			netForce.x += force.x
+			netForce.y += force.y
+		}
+	}
+
+	return netForce
+}
+
+// ComputeForce takes as input two Body objects b1 and b2 and returns
+// an OrderedPair corresponding to the components of a force vector corresponding to the force of gravity of b2 acting on b1.
+func ComputeForce(b1, b2 Body) OrderedPair {
 	var force OrderedPair
 
-	//to fill in
+	//now we do some physics and apply formula
+	//F = G*m1*m2/d^2
+	dist := Distance(b1.position, b2.position)
+
+	//compute magnitude of force
+	F := G * b1.mass * b2.mass / (dist * dist)
+
+	//then, split this into components
+	deltaX := b2.position.x - b1.position.x
+	deltaY := b2.position.y - b1.position.y
+
+	force.x = F * (deltaX / dist)
+	force.y = F * (deltaY / dist)
 
 	return force
 }
