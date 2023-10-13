@@ -23,13 +23,58 @@ func UPGMA(mtx DistanceMatrix, speciesNames []string) Tree {
 		//then, set the two children of t[k]
 		t[k].Child1 = clusters[row]
 		t[k].Child2 = clusters[col]
-		mtx = AddRowCol(mtx, clusters, row, col)
-		mtx = DelRowCol(mtx, row, col)
+		clusterSize1 := CountLeaves(clusters[row])
+		clusterSize2 := CountLeaves(clusters[col])
+		mtx = AddRowCol(row, col, clusterSize1, clusterSize2, mtx)
+		mtx = DeleteRowCol(mtx, row, col)
 		clusters = append(clusters, t[k])
 		clusters = DeleteClusters(clusters, row, col)
 	}
 
 	return t
+}
+
+// AddRowCol takes as input an n x n distance matrix, row and col indices, and two cluster sizes.
+// It returns an (n+1) x (n+1) distance matrix where the final row (and column) correspond to a new cluster clustering the row-th and col-th rows of the matrix together.
+func AddRowCol(row, col, clusterSize1, clusterSize2 int, mtx DistanceMatrix) DistanceMatrix {
+	newRow := make([]float64, len(mtx)+1)
+	for r := 0; r < len(newRow)-1; r++ {
+		if r != row && r != col { // no need to set a value in columns that are going to be deleted
+			//set newRow[r] equal to appropriate weighted average
+			newRow[r] = (float64(clusterSize1)*mtx[row][r] + float64(clusterSize2)*mtx[r][col]) / float64(clusterSize1+clusterSize2)
+		}
+	}
+	//all the row values are set, so append this row to mtx
+	mtx = append(mtx, newRow)
+
+	//what remains is setting new column values too
+	for c := 0; c < len(mtx)-1; c++ {
+		mtx[c] = append(mtx[c], newRow[c])
+	}
+
+	return mtx
+}
+
+// FindMinElement takes as input a distance matrix mtx.
+// It returns two indices (row, col) and the minimum off-diagonal element of the matrix, where this minimum occurs at mtx[row][col].
+// We assume row < col.
+func FindMinElement(mtx DistanceMatrix) (int, int, float64) {
+	if len(mtx) <= 1 || len(mtx[0]) <= 1 {
+		panic("Too small a matrix given.")
+	}
+	row := 0
+	col := 1
+	val := mtx[row][col]
+	for i := 0; i < len(mtx)-1; i++ {
+		for j := i + 1; j < len(mtx[i]); j++ {
+			if mtx[i][j] < val {
+				row = i
+				col = j
+				val = mtx[i][j]
+			}
+		}
+	}
+	return row, col, val
 }
 
 // DeleteClusters takes as input a slice of Node pointers (clusters) and two integers row and col.
