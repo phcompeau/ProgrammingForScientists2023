@@ -25,30 +25,30 @@ type Star struct {
 	red, blue, green                 uint8
 }
 
-//OrderedPair represents a point or vector.
+// OrderedPair represents a point or vector.
 type OrderedPair struct {
 	x float64
 	y float64
 }
 
-//QuadTree simply contains a pointer to the root.
-//Another way of doing this would be type QuadTree *Node
+// QuadTree simply contains a pointer to the root.
+// Another way of doing this would be type QuadTree *Node
 type QuadTree struct {
 	root *Node
 }
 
-//Node object contains a slice of children (this could just as easily be an array of length 4).
-//A node refers to a star. Sometimes, the star will be a "dummy" star, sometimes it is a star in the
-//universe, and sometimes it is nil. Every internal node points to a dummy star.
+// Node object contains a slice of children (this could just as easily be an array of length 4).
+// A node refers to a star. Sometimes, the star will be a "dummy" star, sometimes it is a star in the
+// universe, and sometimes it is nil. Every internal node points to a dummy star.
 type Node struct {
 	children []*Node
 	star     *Star
 	sector   Quadrant
 }
 
-//Quadrant is an object representing a sub-square within a larger universe.
+// Quadrant is an object representing a sub-square within a larger universe.
 type Quadrant struct {
 	x     float64 //bottom left corner x coordinate
-	y     float64 //bottom right corner y coordinate
+	y     float64 //bottom left corner y coordinate
 	width float64
 }
