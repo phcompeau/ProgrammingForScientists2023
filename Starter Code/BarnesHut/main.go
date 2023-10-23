@@ -25,7 +25,7 @@ func main() {
 	initialUniverse := InitializeUniverse(galaxies, width)
 
 	// now evolve the universe: feel free to adjust the following parameters.
-	numGens := 500000
+	numGens := 100000
 	time := 2e14
 	theta := 0.5
 
